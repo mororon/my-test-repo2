@@ -1,0 +1,11 @@
+name: Convert
+on: push
+env:
+  TIMEOUT: 1
+jobs:
+  sleep:
+    runs-on: ubuntu-latest
+    steps:
+      - run: sleep 120
+        # fromJSON関数でJSONデータ型へ値を変換すれば、booleanやnumberとして解釈される
+        timeout-minutes: ${{ fromJSON(env.TIMEOUT)}} # string型をnumber型に変換
