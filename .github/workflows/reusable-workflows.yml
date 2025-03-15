@@ -1,4 +1,4 @@
-name: Reusable Workflows
+name: Reusable Workflowsテスト
 on:
   workflow_call: # Reusable Workflowsを起動するイベント
     inputs: # Reusable Workflowsの入力パラメータ定義(平文)
