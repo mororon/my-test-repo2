@@ -1,0 +1,38 @@
+name: Reusable Workflows
+on:
+  workflow_call: # Reusable Workflowsを起動するイベント
+    inputs: # Reusable Workflowsの入力パラメータ定義(平文)
+      pr-number: # プルリクエスト番号
+        type: string
+        default: ${{ github.event.pull_request.number }}
+        description: プルリクエスト番号
+        required: true
+    secrets: # Reusable Workflowsの入力パラメータ定義(Secrets)
+      token:
+        required: true
+        description: GitHubトークン
+    outputs: # Reusable Workflowsの出力パラメータ定義
+      messages: # メッセージ
+        # ワークフローレベルのoutputsへ、ジョブレベルの出力値をセットする
+        value: ${{ jobs.comment.outputs.pr-comment }}
+        description: メッセージ
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - id: pr-comment
+        run: |
+          body="Welcome, ${GITHUB_ACTOR}!"
+          gh pr comment "${PR_NUMBER}" --body "${body}"
+          #ステップレベルで出力したい値をGITHUB_OUTPUTに出力
+          echo "body=${body}" >> "${GITHUB_OUTPUT}"
+        env:
+          PR_NUMBER: ${{ inputs.pr-number }}
+          GITHUB_TOKEN: ${{ secrets.token }}
+    outputs:
+      # ジョブレベルのoutputsへ、ステップレベルの出力値をセットする
+      pr-comment: ${{ steps.pr-comment.outputs.body }}

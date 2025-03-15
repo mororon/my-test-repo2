@@ -1,0 +1,22 @@
+name: Call
+on: pull_request
+jobs:
+  call:
+    uses: ./.github/workflows/reusable-workflows.yml # Reusable workflowsの指定
+    with:  #平文の入力パラメータ指定
+      pr-number: ${{ github.event.pull_request.number }}
+    secrets: #Secretsの指定
+      token: ${{ secrets.GITHUB_TOKEN }}
+    permissions: #パーミッションの指定
+      contents: read
+      pull-requests: write
+  # callジョブで実行した結果を後続のprintジョブに渡している
+  print:
+    needs: [call]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "RESULT> ${MESSAGE}"
+        env:
+          # Reusable workflowsの出力値を参照するにはneedsキーの依存関係を定義し、needsコンテキスト経由で参照sうる。
+          MESSAGE: ${{ needs.call.outputs.messages }} #出力値の参照
+    
