@@ -1,0 +1,20 @@
+name: Cross repo
+on: push
+env:
+  TARGET_REPO: my-test-repo1 #GitHub Appsのインストール時に設定したリポジトリ
+jobs:
+  checkout:
+    runs-on: ubuntu-latest
+    steps:
+      - id: create
+        uses: actions/create-github-app-token@v1 #GitHub Appsのトークンをせいせい
+        with:
+          app_id: ${{ secrets.APP_ID }} #GitHub Appsのapp_id
+          private_key: ${{ secrets.PRIVATE_KEY }} #GitHub Appsのprivate_key
+          repositories: ${{ env.TARGET_REPO }} #GitHub Appsのインストール時に設定したリポジトリ
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/${{ env.TARGET_REPO }} #GitHub Appsのインストール時に設定したリポジトリ
+          path: ${{ env.TARGET_REPO }} #GitHub Appsのインストール時に設定したリポジトリ
+          token: ${{ steps.create.outputs.token }} #GitHub Appsのトークン
+      - run: cat "${TARGET_REPO}/README.md"
